@@ -1,0 +1,70 @@
+# This is a basic workflow to help you get started with Actions
+name: test1
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    # Required for OIDC token generation
+    permissions:
+      id-token: write
+      contents: read
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      - name: Install Go and Cue
+        uses: actions/setup-go@v6
+        with:
+          cache: false
+          go-version: '1.25'
+      
+      - name: Install Cue
+        run: go install cuelang.org/go/cmd/cue@latest
+
+      - name: Get OIDC token
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('https://reg.rustyx.org')
+            console.log('getIDToken', token)
+            core.setOutput('token', token)
+
+      - name: Authenticate with registry
+        run: |
+          # Authenticate with the registry using OIDC
+          RESPONSE=$(curl -sSL https://reg.rustyx.org/login/oidc/github \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"id_token\":\"${{ steps.oidc.outputs.token }}\"}")
+          
+          echo "Registry response: $RESPONSE"
+          
+          # Extract access token and save to environment
+          ACCESS_TOKEN=$(echo "$RESPONSE" | jq -r '.access_token')
+          
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+            echo "Failed to get access token from registry"
+            echo "Full response: $RESPONSE"
+            exit 1
+          fi
+          
+          echo "Successfully authenticated with registry"
+          echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+      
+      - name: Test registry access
+        run: |
+          # Use the access token to test registry access
+          echo "Testing registry access with bearer token..."
+          curl -sSL https://reg.rustyx.org/v2/ \
+            -H "Authorization: Bearer $ACCESS_TOKEN" || true
