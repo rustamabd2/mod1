@@ -23,23 +23,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      - name: Install Go and Cue
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-          go-version: '1.25'
+      # - name: Install Go and Cue
+      #   uses: actions/setup-go@v6
+      #   with:
+      #     cache: false
+      #     go-version: '1.25'
       
-      - name: Install Cue
-        run: go install cuelang.org/go/cmd/cue@latest
+      # - name: Install Cue
+      #   run: go install cuelang.org/go/cmd/cue@latest
 
-      - name: Get OIDC token
-        id: oidc
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const token = await core.getIDToken('https://reg.rustyx.org')
-            console.log('getIDToken', token)
-            core.setOutput('token', token)
+      # - name: Get OIDC token
+      #   id: oidc
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       const token = await core.getIDToken('https://reg.rustyx.org')
+      #       console.log('getIDToken', token)
+      #       core.setOutput('token', token)
 
       - name: Authenticate with registry
         run: |
