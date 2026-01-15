@@ -54,8 +54,9 @@ jobs:
 
             const loginCmd = `cue login reg.rustyx.org --token ${data.access_token}`
             console.log('exec:', loginCmd)
-            await exec(loginCmd)
+            await exec.exec(loginCmd)
 
+            const fs = require('fs')
             const homeDir = process.env.HOME || process.env.USERPROFILE
             const loginsPath = `${homeDir}/.config/cue/logins.json`
             let loginsContent = fs.readFileSync(loginsPath, 'utf8')
