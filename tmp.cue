@@ -1,6 +1,17 @@
 // Package mod1 comment.
 package mod1
 
+x: #B & {
+	y: [ 1 ]
+}
+
+#B: #A | []
+
+#A: {
+	y?: [...int]
+	...
+}
+
 c1: close({
     foo: string
     bar: int64 & int

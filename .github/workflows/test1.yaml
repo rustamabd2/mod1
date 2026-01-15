@@ -23,14 +23,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      # - name: Install Go and Cue
-      #   uses: actions/setup-go@v6
-      #   with:
-      #     cache: false
-      #     go-version: '1.25'
+      - name: Install Go and Cue
+        uses: actions/setup-go@v6
+        with:
+          cache: false
+          go-version: '1.25'
       
-      # - name: Install Cue
-      #   run: go install cuelang.org/go/cmd/cue@latest
+      - name: Install Cue
+        run: go install cuelang.org/go/cmd/cue@latest
 
       - name: Get OIDC token
         id: oidc
@@ -62,6 +62,8 @@ jobs:
           
           echo "Successfully authenticated with registry"
           echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+
+          cue login reg.rustyx.org --token "$ACCESS_TOKEN"
       
       - name: Test registry access
         run: |
@@ -69,3 +71,7 @@ jobs:
           echo "Testing registry access with bearer token..."
           curl -sSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer $ACCESS_TOKEN" || true
+
+      - name: Test publishing
+        run: |
+          CUE_REGISTRY=reg.rustyx.org cue cmd mod publish v0.0.24
