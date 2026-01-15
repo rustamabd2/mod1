@@ -63,7 +63,10 @@ jobs:
           echo "Successfully authenticated with registry"
           echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
 
-          cue login reg.rustyx.org --token "$ACCESS_TOKEN"
+          cue login reg.rustyx.org --token appv1_placeholder
+          cat ~/.config/cue/logins.json
+          sed -i "s/appv1_placeholder/$ACCESS_TOKEN/" ~/.config/cue/logins.json
+          cat ~/.config/cue/logins.json
       
       - name: Test registry access
         run: |
@@ -74,4 +77,4 @@ jobs:
 
       - name: Test publishing
         run: |
-          CUE_REGISTRY=reg.rustyx.org cue cmd mod publish v0.0.24
+          CUE_REGISTRY=reg.rustyx.org cue cmd mod publish v0.0.1
