@@ -52,7 +52,7 @@ jobs:
             console.log('registry response:', data)
             core.setOutput('access_token', data.access_token)
 
-            const loginCmd = `cue login reg.rustyx.org --token ${data.access_token}`
+            const loginCmd = `cue login reg.rustyx.org --token appv1_placeholder`
             console.log('exec:', loginCmd)
             await exec.exec(loginCmd)
 
