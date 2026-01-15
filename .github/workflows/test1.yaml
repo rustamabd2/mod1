@@ -41,37 +41,35 @@ jobs:
             console.log('getIDToken', token)
             core.setOutput('token', token)
 
-      - name: Authenticate with registry
-        run: |
-          # Authenticate with the registry using OIDC
-          RESPONSE=$(curl -sSL https://reg.rustyx.org/login/oidc/github \
-            -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"id_token\":\"${{ steps.oidc.outputs.token }}\"}")
-          
-          echo "Registry response: $RESPONSE"
-          
-          # Extract access token and save to environment
-          ACCESS_TOKEN=$(echo "$RESPONSE" | jq -r '.access_token')
-          
-          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
-            echo "Failed to get access token from registry"
-            echo "Full response: $RESPONSE"
-            exit 1
-          fi
-          
-          echo "Successfully authenticated with registry"
-          echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+            const res = await fetch('https://reg.rustyx.org/login/oidc/github', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ id_token: token })
+            })
+            const data = await res.json()
+            console.log('registry response:', data)
+            core.setOutput('access_token', data.access_token)
 
-          cue login reg.rustyx.org --token appv1_placeholder
-          sed -i "s/appv1_placeholder/$ACCESS_TOKEN/" ~/.config/cue/logins.json
+            const { exec } = require('@actions/exec')
+            const loginCmd = `cue login reg.rustyx.org --token ${data.access_token}`
+            console.log('exec:', loginCmd)
+            await exec(loginCmd)
+
+            const fs = require('fs')
+            const homeDir = process.env.HOME || process.env.USERPROFILE
+            const loginsPath = `${homeDir}/.config/cue/logins.json`
+            let loginsContent = fs.readFileSync(loginsPath, 'utf8')
+            loginsContent = loginsContent.replace('appv1_placeholder', data.access_token)
+            fs.writeFileSync(loginsPath, loginsContent)
       
       - name: Test registry access
         run: |
           # Use the access token to test registry access
           echo "Testing registry access with bearer token..."
           curl -sSL https://reg.rustyx.org/v2/ \
-            -H "Authorization: Bearer $ACCESS_TOKEN" || true
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
       - name: Test publishing
         run: |
