@@ -34,7 +34,7 @@ jobs:
 
       - name: Login to CUE registry
         id: oidc
-        uses: rustamabd2/login-github-oidc@v1
+        uses: rustamabd2/login-github-oidc@main
         with:
           registry: reg.rustyx.org
 
