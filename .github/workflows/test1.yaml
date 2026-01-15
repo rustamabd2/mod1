@@ -32,37 +32,12 @@ jobs:
       - name: Install Cue
         run: go install cuelang.org/go/cmd/cue@latest
 
-      - name: Get OIDC token
+      - name: Login to CUE registry
         id: oidc
-        uses: actions/github-script@v7
+        uses: rustamabd2/login-github-oidc@v1
         with:
-          script: |
-            const token = await core.getIDToken('https://reg.rustyx.org')
-            console.log('getIDToken', token)
-            core.setOutput('token', token)
+          registry: reg.rustyx.org
 
-            const res = await fetch('https://reg.rustyx.org/login/oidc/github', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ id_token: token })
-            })
-            const data = await res.json()
-            console.log('registry response:', data)
-            core.setOutput('access_token', data.access_token)
-
-            const loginCmd = `cue login reg.rustyx.org --token appv1_placeholder`
-            console.log('exec:', loginCmd)
-            await exec.exec(loginCmd)
-
-            const fs = require('fs')
-            const homeDir = process.env.HOME || process.env.USERPROFILE
-            const loginsPath = `${homeDir}/.config/cue/logins.json`
-            let loginsContent = fs.readFileSync(loginsPath, 'utf8')
-            loginsContent = loginsContent.replace('appv1_placeholder', data.access_token)
-            fs.writeFileSync(loginsPath, loginsContent)
-      
       - name: Test registry access
         run: |
           # Use the access token to test registry access
