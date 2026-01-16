@@ -19,7 +19,7 @@ jobs:
       - name: Login to CUE registry
         uses: rustamabd2/login-github-oidc@v1
         with:
-          registry: reg.rustyx.org
+          registry: registry-staging-599818415546.europe-west1.run.app
 
       - name: Test registry access
         run: |
