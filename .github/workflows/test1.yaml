@@ -33,7 +33,6 @@ jobs:
         run: go install cuelang.org/go/cmd/cue@latest
 
       - name: Login to CUE registry
-        id: oidc
         uses: rustamabd2/login-github-oidc@main
         with:
           registry: reg.rustyx.org
