@@ -33,7 +33,7 @@ jobs:
         run: |
           # Use the access token to test registry access
           echo "Testing registry access with bearer token..."
-          curl -fsSL https://reg.rustyx.org/v2/ \
+          curl -sSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" || true
 
       - name: Install Go and Cue
