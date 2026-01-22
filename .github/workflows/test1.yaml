@@ -15,7 +15,7 @@ jobs:
     
     # Required for OIDC token generation
     permissions:
-      id-token: write
+      # id-token: write
       contents: read
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -33,6 +33,7 @@ jobs:
         run: go install cuelang.org/go/cmd/cue@latest
 
       - name: Login to CUE registry
+        id: oidc
         uses: rustamabd2/login-github-oidc@main
         with:
           registry: reg.rustyx.org
@@ -41,8 +42,8 @@ jobs:
         run: |
           # Use the access token to test registry access
           echo "Testing registry access with bearer token..."
-          curl -sSL https://reg.rustyx.org/v2/ \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
+          curl -fsSL https://reg.rustyx.org/v2/ \
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" || true
 
       - name: Test publishing
         run: |

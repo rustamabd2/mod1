@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Login to CUE registry
-        uses: rustamabd2/login-github-oidc@v1
+        id: oidc
+        uses: rustamabd2/login-github-oidc@main
         with:
           registry: registry-staging-599818415546.europe-west1.run.app
 
@@ -26,7 +27,7 @@ jobs:
           # Use the access token to test registry access
           echo "Testing registry access with bearer token..."
           curl -sSL https://registry-staging-599818415546.europe-west1.run.app/v2/ \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
+            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" || true
 
       - name: Test publishing
         run: |
