@@ -23,15 +23,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      - name: Install Go and Cue
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-          go-version: '1.25'
-      
-      - name: Install Cue
-        run: go install cuelang.org/go/cmd/cue@latest
-
       - name: Login to CUE registry
         id: oidc
         uses: rustamabd2/login-github-oidc@main
@@ -44,6 +35,15 @@ jobs:
           echo "Testing registry access with bearer token..."
           curl -fsSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" || true
+
+      - name: Install Go and Cue
+        uses: actions/setup-go@v6
+        with:
+          cache: false
+          go-version: '1.25'
+      
+      - name: Install Cue
+        run: go install cuelang.org/go/cmd/cue@latest
 
       - name: Test publishing
         run: |
