@@ -16,7 +16,7 @@ jobs:
     # Required for OIDC token generation
     permissions:
       id-token: write
-      # contents: read
+      contents: read
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -32,8 +32,7 @@ jobs:
       - name: Test registry access
         run: |
           # Use the access token to test registry access
-          echo "tok=${{ steps.oidc.outputs.access_token }}"
-          echo "Testing registry access with bearer token ${{ steps.oidc.outputs.access_token }}..."
+          echo "Testing registry access with bearer token..."
           curl -sSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
