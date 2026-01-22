@@ -35,6 +35,7 @@ jobs:
           echo "Testing registry access with bearer token..."
           curl -sSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" || true
+          echo "${{ steps.oidc.outputs.token }}"
 
       - name: Install Go and Cue
         uses: actions/setup-go@v6
