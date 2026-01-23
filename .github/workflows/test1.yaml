@@ -36,7 +36,7 @@ jobs:
           curl -sSL https://reg.rustyx.org/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
-      - name: Install Go and Cue
+      - name: Install Go
         uses: actions/setup-go@v6
         with:
           cache: false

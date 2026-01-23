@@ -29,6 +29,15 @@ jobs:
           curl -sSL https://registry-staging-599818415546.europe-west1.run.app/v2/ \
             -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          cache: false
+          go-version: '1.25'
+      
+      - name: Install Cue
+        run: go install cuelang.org/go/cmd/cue@latest
+
       - name: Test publishing
         run: |
           CUE_REGISTRY=registry-staging-599818415546.europe-west1.run.app cue mod publish v0.0.1
