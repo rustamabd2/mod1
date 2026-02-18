@@ -4,40 +4,41 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     # Required for OIDC token generation
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Login to CUE registry
-        id: oidc
-        uses: rustamabd2/login-github-oidc@main
-        with:
-          registry: registry-staging-599818415546.europe-west1.run.app
+    - name: Login to CUE registry
+      id: oidc
+      uses: cue-labs/registry-login-action@v1
+      with:
+        registry: registry-staging-599818415546.europe-west1.run.app
 
-      - name: Test registry access
-        run: |
-          # Use the access token to test registry access
-          echo "Testing registry access with bearer token..."
-          curl -sSL https://registry-staging-599818415546.europe-west1.run.app/v2/ \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
+    - name: Test registry access
+      run: |
+        # Use the access token to test registry access
+        echo "Testing registry access with bearer token..."
+        curl -sSL https://registry-staging-599818415546.europe-west1.run.app/v2/ \
+          -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
-      - name: Install Go
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-          go-version: '1.25'
-      
-      - name: Install Cue
-        run: go install cuelang.org/go/cmd/cue@latest
+    - name: Install Go
+      uses: actions/setup-go@v6
+      with:
+        cache: false
+        go-version: '1.25'
 
-      - name: Test publishing
-        run: |
-          CUE_REGISTRY=registry-staging-599818415546.europe-west1.run.app cue mod publish v0.0.1
+    - name: Install Cue
+      run: go install cuelang.org/go/cmd/cue@latest
+
+    - name: Test publishing
+      run: |
+        CUE_REGISTRY=registry-staging-599818415546.europe-west1.run.app cue mod publish v0.0.1
