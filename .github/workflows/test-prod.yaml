@@ -17,7 +17,7 @@ jobs:
 
     - name: Login to CUE registry
       id: oidc
-      uses: cue-labs/registry-login-action@66d40052b0206031343e17173425fa10508968d0
+      uses: cue-labs/registry-login-action@main
 
     - name: Test registry access
       run: |
