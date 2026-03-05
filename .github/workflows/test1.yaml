@@ -5,14 +5,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
     environment: env1
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+
     # Required for OIDC token generation
     permissions:
       id-token: write
@@ -20,31 +20,31 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v4
 
-      - name: Login to CUE registry
-        id: oidc
-        uses: rustamabd2/login-github-oidc@main
-        with:
-          registry: reg.rustyx.org
+    - name: Login to CUE registry
+      id: oidc
+      uses: rustamabd2/login-github-oidc@test
+      with:
+        registry: reg.rustyx.org
 
-      - name: Test registry access
-        run: |
-          # Use the access token to test registry access
-          echo "Testing registry access with bearer token ${{ steps.oidc.outputs.access_token }}..."
-          curl -sSL https://reg.rustyx.org/v2/ \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
+    - name: Test registry access
+      run: |
+        # Use the access token to test registry access
+        echo "Testing registry access with bearer token ${{ steps.oidc.outputs.access_token }}..."
+        curl -sSL https://reg.rustyx.org/v2/ \
+          -H "Authorization: Bearer ${{ steps.oidc.outputs.access_token }}" || true
 
-      - name: Install Go
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-          go-version: '1.25'
-      
-      - name: Install Cue
-        run: go install cuelang.org/go/cmd/cue@latest
+    - name: Install Go
+      uses: actions/setup-go@v6
+      with:
+        cache: false
+        go-version: '1.25'
 
-      - name: Test publishing
-        run: |
-          CUE_REGISTRY=reg.rustyx.org cue mod publish v0.0.1
+    - name: Install Cue
+      run: go install cuelang.org/go/cmd/cue@latest
+
+    - name: Test publishing
+      run: |
+        CUE_REGISTRY=reg.rustyx.org cue mod publish v0.0.1
